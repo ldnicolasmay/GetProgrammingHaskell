@@ -18,8 +18,8 @@ countsText (cc,wc,lc) = mconcat [show cc,",",show wc,",",show lc]
 
 main :: IO ()
 main = do
-  args        <- getArgs            -- args :: [String]
-  let fileName = head args          -- fileName :: String
+  args        <- getArgs    -- args :: [String]
+  let fileName = head args  -- fileName :: String
   --
   fileStr        <- readFile fileName  -- fileStr :: String
   let fileCounts  = getCounts fileStr  -- fileCounts :: FileCounts

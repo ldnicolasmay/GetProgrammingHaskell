@@ -11,24 +11,7 @@ import System.Environment
 -- writeFile :: FilePath -> String -> IO ()
 -- appendFile :: FilePath -> String -> IO ()
 
-
 type FileCounts = (Int,Int,Int)
-
-
-main :: IO ()
-main = do
-  args <- getArgs                               -- args :: [String]
-  let fileName = head args                      -- fileName :: String
-  helloStr <- readFile fileName                 -- helloStr :: String
-  let helloCounts = getCounts helloStr          -- helloCounts :: (Int,Int,Int)
-  --
-  statsFile <- openFile "stats.dat" AppendMode  -- statsFile :: IO Handle
-  hPutStrLn statsFile (mconcat [fileName," -- ",countsText helloCounts])
-  hClose statsFile
-  --
-  putStrLn (mconcat [fileName," -- ",countsText helloCounts])
-  putStrLn "Done"
---
 
 -- getCounts :: String -> (Int,Int,Int)
 getCounts :: String -> FileCounts
@@ -45,3 +28,53 @@ countsText (cc,wc,lc) = unwords [ "chars: ",show cc,"  " -- unwords / mconcat
 --
 
 
+-- main :: IO ()
+-- main = do
+--   args <- getArgs                               -- args :: [String]
+--   let fileName = head args                      -- fileName :: String
+--   helloStr <- readFile fileName                 -- helloStr :: String
+--   let helloCounts = getCounts helloStr          -- helloCounts :: (Int,Int,Int)
+--   --
+--   statsFile <- openFile "stats.dat" AppendMode  -- statsFile :: IO Handle
+--   hPutStrLn statsFile (mconcat [fileName," -- ",countsText helloCounts])
+--   hClose statsFile
+--   --
+--   putStrLn (mconcat [fileName," -- ",countsText helloCounts])
+--   putStrLn "Done"
+-- --
+
+
+
+-- 24.3 The Trouble with Lazy I/O
+
+-- main :: IO ()
+-- main = do
+--   args <- getArgs
+--   let fileName = head args
+--   input <- readFile fileName
+--   let summary = (countsText . getCounts) input
+--   appendFile "stats.dat" (mconcat [fileName, " ",summary, "\n"])
+--   putStrLn summary
+
+-- main :: IO ()
+-- main = do
+--   args <- getArgs
+--   let fileName = head args
+--   file <- openFile fileName ReadMode
+--   input <- hGetContents file
+--   hClose file
+--   let summary = (countsText . getCounts) input
+--   appendFile "stats.dat" (mconcat [fileName, " ",summary, "\n"])
+--   putStrLn summary
+
+main :: IO ()
+main = do
+  args <- getArgs
+  let fileName = head args
+  file <- openFile fileName ReadMode
+  input <- hGetContents file
+  let summary = (countsText . getCounts) input
+  putStrLn summary
+  hClose file
+  appendFile "stats.dat" (mconcat [fileName," ",summary,"\n"])
+--
