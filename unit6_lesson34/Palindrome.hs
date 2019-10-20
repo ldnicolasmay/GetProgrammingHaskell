@@ -1,5 +1,7 @@
 -- Palindrome.hs
 
+{-# LANGUAGE OverloadedStrings #-}
+
 module Palindrome (isPalindrome) where
 
 -- import Data.Char (toLower,isSpace,isPunctuation)
