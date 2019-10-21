@@ -11,7 +11,14 @@ import System.Environment
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 import System.Random
+import Control.Monad
 
+
+-- randomChar :: IO Char
+-- randomChar = do
+--   randInt     <- randomRIO (0,255)
+--   let randChar = toEnum randInt
+--   return randChar
 
 intToChar :: Int -> Char
 intToChar int = toEnum safeInt
@@ -33,25 +40,77 @@ randomReplaceByte bytes = do
   charVal  <- randomRIO (0,255)
   return (replaceByte location charVal bytes) 
 
+sortSection :: Int -> Int -> BC.ByteString -> BC.ByteString
+sortSection start size bytes = mconcat [before,changed,after]
+  where (before,rest)  = BC.splitAt start bytes
+        (target,after) = BC.splitAt size rest
+        changed        = BC.reverse (BC.sort target)
+
+randomSortSection :: BC.ByteString -> IO BC.ByteString
+randomSortSection bytes = do
+  let sectionSize = 5
+  let bytesLength = BC.length bytes
+  start <- randomRIO (0,bytesLength - sectionSize)
+  return (sortSection start sectionSize bytes)
+
+
+-- main :: IO ()
+-- main = do
+--   args <- getArgs           -- args :: [String]
+--   let fileName = head args  -- fileName :: String
+--   --
+--   imageFile <- BC.readFile fileName        -- imageFile :: BC.ByteString
+--   -- glitched <- return imageFile             -- glitched :: BC.ByteString
+--   -- glitched <- randomReplaceByte imageFile  -- glitched :: BC.ByteString
+--   glitched <- randomSortSection imageFile
+--   -- putStrLn (BC.unpack glitched)
+--   let glitchedFileName = mconcat ["glitched_",fileName] 
+--   BC.writeFile glitchedFileName glitched
+--   --
+--   putStrLn "Done."
+--
+
+-- main :: IO ()
+-- main = do
+--   args <- getArgs           -- args :: [String]
+--   let fileName = head args  -- fileName :: String
+--   --
+--   imageFile <- BC.readFile fileName        -- imageFile :: BC.ByteString
+--   glitched1 <- randomReplaceByte imageFile
+--   glitched2 <- randomSortSection glitched1
+--   glitched3 <- randomReplaceByte glitched2
+--   glitched4 <- randomSortSection glitched3
+--   glitched5 <- randomReplaceByte glitched4
+--   let glitchedFileName = mconcat ["glitched_",fileName] 
+--   BC.writeFile glitchedFileName glitched5
+--   --
+--   putStrLn "Done."
+--
+
+glitchActions :: [BC.ByteString -> IO BC.ByteString]
+glitchActions = [ randomReplaceByte 
+                , randomSortSection
+                , randomReplaceByte
+                , randomSortSection
+                , randomReplaceByte
+                , randomSortSection
+                , randomReplaceByte
+                ]
 
 main :: IO ()
 main = do
-  args <- getArgs           -- args :: [String]
-  let fileName = head args  -- fileName :: String
+  args <- getArgs
+  let fileName = head args
   --
-  imageFile <- BC.readFile fileName        -- imageFile :: BC.ByteString
-  -- glitched  <- return imageFile         -- glitched :: BC.ByteString
-  glitched <- randomReplaceByte imageFile  -- glitched :: BC.ByteString
-  -- putStrLn (BC.unpack glitched)
-  let glitchedFileName = mconcat ["glitched_",fileName] 
+  imageFile <- BC.readFile fileName
+  -- glitched <- foldM (\bytes f -> f bytes) imageFile [ randomReplaceByte 
+  --                                                   , randomSortSection
+  --                                                   , randomReplaceByte
+  --                                                   , randomSortSection
+  --                                                   , randomReplaceByte
+  --                                                   ]
+  glitched <- foldM (\bytes f -> f bytes) imageFile glitchActions
+  let glitchedFileName = mconcat ["glitched_",fileName]
   BC.writeFile glitchedFileName glitched
-  --
   putStrLn "Done."
 --
-
-cdc
-randomChar :: IO Char
-randomChar = do
-  randInt     <- randomRIO (0,255)
-  let randChar = toEnum randInt
-  return randChar
