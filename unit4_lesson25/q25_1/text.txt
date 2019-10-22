@@ -1,0 +1,7 @@
+Here's some text in a file.
+It's a text file for testing the script 'unit4_lesson25_compare_length.hs'.
+Here's another line of text.
+... and another.
+Huzzah!
+   
+(§3.17)
