@@ -40,11 +40,11 @@ prop_reverseInvariant text = isPalindrome text == isPalindrome reverseText
 prop_whiteSpaceInvariant :: T.Text -> Bool
 prop_whiteSpaceInvariant text = preprocess text == preprocess noWhiteSpaceText
   where noWhiteSpaceText = T.filter (not . isSpace) text
-  
+
 prop_caseInvariant :: T.Text -> Bool
 prop_caseInvariant text = preprocess text == preprocess lowerText
   where lowerText = T.toLower text
-  
+
 main :: IO ()
 main = do
   putStrLn ""
